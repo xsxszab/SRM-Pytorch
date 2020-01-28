@@ -162,7 +162,6 @@ class Stage2(nn.Module):
             v in pretrained_dict.items() if k in model_dict}
         model_dict.update(pretrained_dict)
         self.load_state_dict(model_dict)
-        del pretrained_dict
 
 
 class PPM(nn.Module):
@@ -191,13 +190,13 @@ class PPM(nn.Module):
 
     def forward(self, x):  # x shape: 24*24
         x1 = self.block1(x)
-        x1 = nn.functional.interpolate(x1, size=24)
+        x1 = nn.functional.interpolate(x1, size=24, mode='bilinear', align_corners=True)
         x2 = self.block2(x)
-        x2 = nn.functional.interpolate(x2, size=24)
+        x2 = nn.functional.interpolate(x2, size=24, mode='bilinear', align_corners=True)
         x3 = self.block3(x)
-        x3 = nn.functional.interpolate(x3, size=24)
+        x3 = nn.functional.interpolate(x3, size=24, mode='bilinear', align_corners=True)
         x4 = self.block4(x)
-        x4 = nn.functional.interpolate(x4, size=24)
+        x4 = nn.functional.interpolate(x4, size=24, mode='bilinear', align_corners=True)
         output = torch.cat([x, x1, x2, x3, x4], 1)
         return output
 
@@ -212,17 +211,19 @@ class SRM(nn.Module):
         self.conv2 = nn.Conv2d(256, 64, 3, padding=1)
         self.conv6 = nn.Conv2d(66, 256, 3, padding=1)
         self.conv7 = nn.Conv2d(256, 2, 3, padding=1)
+
     def forward(self, x):
         feature1 = self.stage1(x)
-        output1 = nn.functional.interpolate(feature1, size=384)
+        output1 = nn.functional.interpolate(feature1, size=384, mode='bilinear', align_corners=True)
         feature2 = self.stage2(x)
         feature2 = self.conv1(feature2)
         feature2 = self.conv2(feature2)
-        feature1 = nn.functional.interpolate(feature1, size=24)
+        feature1 = nn.functional.interpolate(feature1, size=24, mode='bilinear', align_corners=True)
         feature = torch.cat([feature1, feature2], 1)
         feature = self.conv6(feature)
         feature = self.conv7(feature)
-        output2 = nn.functional.interpolate(feature, size=384)
+        output2 = nn.functional.interpolate(feature, size=384, mode='bilinear', align_corners=True)
+
         return output1, output2
 
 

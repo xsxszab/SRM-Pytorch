@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 
+
 def get_mae(pred, gt, in_type='numpy'):
     """Get average MAE for evaluation.
 
@@ -113,9 +114,6 @@ def get_f_measure(pred, gt, in_type='numpy', beta_square=0.3, threshold='adaptiv
     return f_measure
 
 
-
-
-
 def saveimg(img ,save_path, name, save_type='png'):
     """Save single saliency map to disk.
 
@@ -129,6 +127,17 @@ def saveimg(img ,save_path, name, save_type='png'):
     full_name = name + '.' + save_type
     full_path = os.path.join(save_path, full_name)
     plt.imsave(full_path, img, cmap='gray')
+
+
+def get_pred(img):
+    """get 2D saliency prediction from two-channel output saliency image(foreground channel and background channel)
+
+        :param img: tensor with shape [batch_size, 2, 256, 256]
+    """
+    img = img.exp()
+    sal = img[:, 0, None, :, :] / (img[:, 0, None, :, :] + img[:, 1, None, :, :])
+    return sal
+
 
 def test():
     """test get_mae and get_f_measure"""

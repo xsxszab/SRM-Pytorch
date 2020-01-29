@@ -1,3 +1,5 @@
 ## SRM for saliency object detection
 
-unfinished yet.
+(readme will be completed in later commit)
+
+run train.py.
